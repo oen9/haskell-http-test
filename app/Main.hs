@@ -14,8 +14,10 @@ main :: IO ()
 main = 
   do
     args <- getArgs
-    let readedPort = readPort args
-        portNumber = fromMaybe 8000 readedPort
+    envPortStr <- lookupEnv "PORT"
+    let argPort = readPort args
+        envPort = fmap (\p -> read p :: Int) envPortStr
+        portNumber = head $ maybeToList argPort ++ maybeToList envPort ++ [8000]
     putStrLn $ "app started on port: " ++ (show portNumber) ++ " use `-port number` to change it"
     simpleHTTP nullConf {port = portNumber} myApp
 
